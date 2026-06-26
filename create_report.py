@@ -27,13 +27,13 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     saved_audio = uploaded_file.getvalue()
 
-st.title("Audio Recorder")
-audio = audiorecorder("Click to record", "Click to stop recording")
+# st.title("Audio Recorder")
+# audio = audiorecorder("Click to record", "Click to stop recording")
 
-if len(audio) > 0:
-    # save audio as torch tensor DOES NOT WORK
-    saved_audio = torch.from_numpy(np.array(audio))
-    st.audio(saved_audio)
+# if len(audio) > 0:
+#     # save audio as torch tensor DOES NOT WORK
+#     saved_audio = torch.from_numpy(np.array(audio))
+#     st.audio(saved_audio)
     
 
 btn_submit_audio = st.button("Submit Audio")

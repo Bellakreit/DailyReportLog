@@ -1,33 +1,30 @@
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import pipeline
+from typer import prompt
 
-device = "cuda"
-model_path = "ibm-granite/granite-4.1-30b"
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-# drop device_map if running on CPU
-model = AutoModelForCausalLM.from_pretrained(model_path, device_map=device)
-model.eval()
-# change input text as desired
-chat = [
-    { "role": "user", "content": "
-    Rewrite the paragraph below into the exact labeled sections shown, using the same information and a professional tone.
-    Do not invent facts, and preserve the meaning of the original content. 
-    Use the section labels exactly as shown, and format the output like this:\n\n
-    Description: ...\n\n
-    Safety: ...\n
-    PPE: ...\n\n
-    Workers and hours:\n
-    jose - 8 hours\n
-    maria - 7 hours\n 
-    " },
-]
-chat = tokenizer.apply_chat_template(chat, tokenize=False, add_generation_prompt=True)
-# tokenize the text
-input_tokens = tokenizer(chat, return_tensors="pt").to(device)
-# generate output tokens
-output = model.generate(**input_tokens, 
-                        max_new_tokens=100)
-# decode output tokens into text
-output = tokenizer.batch_decode(output)
-# print output
-print(output[0])
+pipe = pipeline("text-generation", model="mistralai/Mistral-7B-Instruct-v0.2")
+
+def classify_text(text):
+        prompt = f"""
+            You are filling out a structured report.
+
+            Read the transcript and answer the following fields clearly:
+            you will return a python dictionary with the following keys:
+            #Description, HardHatUsed, GlovesUsed, EyeProtectionUsed, EarProtectionUsed, FootwareUsed, DustMaskUsed, OtherPPEUsed
+            - "Description" this is text format 
+            - "HardHatUsed" this is a boolean value (True or False)
+            - "GlovesUsed" this is a boolean value (True or False)
+            - "EyeProtectionUsed" this is a boolean value (True or False)
+            - "EarProtectionUsed" this is a boolean value (True or False)
+            - "FootwareUsed" this is a boolean value (True or False)
+            - "DustMaskUsed" this is a boolean value (True or False)
+            - "OtherPPEUsed" this is a boolean value (True or False)
+            - "WorkerHours" (this should be a dictionary inside the dictionary with the keys "worker_name" and values "hours_worked")
+
+            Transcript:
+            {text}
+            Please provide the output in a valid Python dictionary format.
+        """
+        return pipe(prompt)
+
+print(classify_text("Today we had four guys on site. Mike Rodriguez worked 9 hours running new copper supply lines on the second floor bathroom rough-in. He was wearing his hard hat, gloves, and steel toe boots the whole time. Carlos Mendez put in 8 hours sweating fittings and installing the shower valve, had his hard hat and safety glasses on. We also had Danny Park for 6 hours doing demo on the old cast iron drain lines — he had full PPE, hard hat, gloves, eye protection, ear protection, dust mask, and boots because of the demo work. Lastly Jose Vega came in for 4 hours to help with material staging, he had his hard hat and boots on but no gloves or eye protection. Overall it was a productive day, we got the second floor rough-in about 70 percent complete and expect to finish the drain lines tomorrow. No incidents or injuries to report."))
+
