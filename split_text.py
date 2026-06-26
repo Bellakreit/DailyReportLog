@@ -1,65 +1,59 @@
 from transformers import pipeline
+import re
+import ast
 
 pipe = pipeline(
     "text-generation",
-    model="Qwen/Qwen2.5-0.5B-Instruct",  # 0.5B instead of 3B, much faster on CPU
+    model="Qwen/Qwen2.5-0.5B-Instruct",  # 0.5B instead of 1.5B/3B, much faster on CPU
     device=-1,
     temperature=0.2
 )
 
 def classify_text(text):
-    prompt = f"""
-You are filling out a structured safety report.
+    prompt = f"""You extract information from construction daily reports.
 
-Extract the following fields and return ONLY a valid Python dictionary.
+Fill in the provided Python dictionary using ONLY information from the transcript.
 
 Rules:
-only hours should be specific for each worker
-Use True or False for booleans
-Do not include extra text
-WorkerHours must be a dictionary inside the dictionary: {{ "Name": hours }}
+- Return ONLY the completed Python dictionary.
+- Do not use markdown.
+- Do not do any explanation only the python dictionary.
+- Do not add any text before or after the dictionary!.
+- Fill in every field.
+- Description: summarize the work performed in 2-3 sentences, add specific details.
+- PPE fields are True if ANY worker used that PPE; otherwise False.
+- If PPE is not mentioned, use False.
+- WorkerHours maps each worker's full name to the number of hours worked.
+- If no workers are mentioned, return an empty WorkerHours dictionary.
 
-ALL Keys(so each key is in the dictionary with a value):
-Description (string)
-HardHatUsed (bool)
-GlovesUsed (bool)
-EyeProtectionUsed (bool)
-EarProtectionUsed (bool)
-FootwareUsed (bool)
-DustMaskUsed (bool)
-OtherPPEUsed (bool)
-WorkerHours (dict)
+Dictionary:
 
-do it like this but based on the input given not this fake example:
-
-    {{
-        "Description": "description of the work done based on the input",
-        "HardHatUsed": boolean based on the input,
-        "GlovesUsed": boolean based on the input,
-        "EyeProtectionUsed": boolean based on the input,
-        "EarProtectionUsed": boolean based on the input,
-        "FootwareUsed": boolean based on the input,
-        "DustMaskUsed": boolean based on the input,
-        "OtherPPEUsed": boolean based on the input,
-        "WorkerHours": {{
-            "name of worker": hours,
-            "Carlos Mendez example name": 8 example hours,
-        }}
-    }}
-
+{{
+    "Description": "",
+    "HardHatUsed": False,
+    "GlovesUsed": False,
+    "EyeProtectionUsed": False,
+    "EarProtectionUsed": False,
+    "FootwearUsed": False,
+    "DustMaskUsed": False,
+    "OtherPPEUsed": False,
+    "WorkerHours": {{}}
+}}
 
 Transcript:
 {text}
 
 Output:
-"""
+"""  
 
     result = pipe(prompt)[0]["generated_text"]
-
-    # remove prompt from output (Qwen may echo it)
     output = result.replace(prompt, "").strip()
 
-    return output
+    # Extract just the dict from whatever the model returns
+
+    match = re.search(r'\{.*\}', output, re.DOTALL)
+    output = match.group(0) if match else "{}"
+    return ast.literal_eval(output)  # returns actual dict
 
 
-print(classify_text("Today we had four guys on site. Mike Rodriguez worked 9 hours running new copper supply lines on the second floor bathroom rough-in. He was wearing his hard hat, gloves, and steel toe boots the whole time. Carlos Mendez put in 8 hours sweating fittings and installing the shower valve, had his hard hat and safety glasses on. We also had Danny Park for 6 hours doing demo on the old cast iron drain lines — he had full PPE, hard hat, gloves, eye protection, ear protection, dust mask, and boots because of the demo work. Lastly Jose Vega came in for 4 hours to help with material staging, he had his hard hat and boots on but no gloves or eye protection. Overall it was a productive day, we got the second floor rough-in about 70 percent complete and expect to finish the drain lines tomorrow. No incidents or injuries to report."))
+# print(classify_text("today on the project we installed 20 toilets and 4 sinks. we finished floor 2 and 50 percent done with floor 3. workers john smith and jane doe were on site. john worked 8 hours and jane worked 6 hours. everyone wore hard hats, gloves, and eye protection. john also wore a dust mask."))

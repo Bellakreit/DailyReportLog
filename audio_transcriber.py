@@ -13,7 +13,6 @@ PIPE_KWARGS = {}
 if USE_GPU:
     PIPE_KWARGS["torch_dtype"] = torch.float16
 
-print("Using GPU" if USE_GPU else "Using CPU (no GPU detected)")
 
 pipe = pipeline(
     "automatic-speech-recognition",
@@ -25,8 +24,7 @@ pipe = pipeline(
 
 def transcribe_audio(audio_file):
     result = pipe(audio_file)
-    print(result)
-    return result
+    return result["text"]
 
-if __name__ == "__main__":
-    transcribe_audio("practice.mp3")
+#if __name__ == "__main__":
+    #transcribe_audio("practice.mp3")

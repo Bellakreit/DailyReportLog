@@ -2,11 +2,14 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sqlite3
-from audiorecorder import audiorecorder
+#from audiorecorder import audiorecorder
 from report_form import show_report_form
+# from report_form import fill_report_form
 from audio_transcriber import transcribe_audio
 from pathlib import Path
 import torch
+
+from split_text import classify_text
 
 st.title("Create Report", text_alignment="center")
 st.header("Create a new report")
@@ -39,12 +42,15 @@ if uploaded_file is not None:
 btn_submit_audio = st.button("Submit Audio")
 if btn_submit_audio:
     # Transcribe the audio
-    with st.spinner("Transcribing audio..."):
+    with st.spinner("Creating report...this will take a few minutes"):
         transcription = transcribe_audio(saved_audio)
-        st.write("Transcription:")
-        st.write(transcription)
+        dict_result = classify_text(transcription)
+        # transform the string dictionary to an actual Python dictionary
+        st.write("Extracted Information:")
+        st.write(dict_result)
         st.success("Audio submitted successfully!")
-        show_report_form()
+        show_report_form(dict_result)
+        #fill_report_form(dict_result)
 
 btnshow = st.button("Enter Report Manually")
 if btnshow:
