@@ -69,12 +69,13 @@ def show_report_form(dict_result=None):
         st.session_state._prefilled = False  # reset for next open
         st.success("Report submitted successfully!")
         st.rerun()
+        st.session_state.show_form = False  # Close the dialog after submission
 
 
 def submit_report(conn, date, description, hard_hat_used, gloves_used, eye_protection_used, ear_protection_used, footware_used, dust_mask_used, other_ppe_used):
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO Reports (Date, Description, HardHatUsed, GlovesUsed, EyeProtectionUsed, EarProtectionUsed, FootwareUsed, DustMaskUsed, OtherPPEUsed)
+        INSERT INTO Reports (Date, Description, HardHatUsed, GlovesUsed, EyeProtectionUsed, EarProtectionUsed, FootwearUsed, DustMaskUsed, OtherPPEUsed)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (date, description, hard_hat_used, gloves_used, eye_protection_used, ear_protection_used, footware_used, dust_mask_used, other_ppe_used))
     conn.commit()

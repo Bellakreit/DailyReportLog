@@ -1,4 +1,7 @@
 import streamlit as st
+import sqlite3
+import pandas as pd
+
 st.logo("Designer.png", size='large')
 
 def btnSeeAllReports_Click():
@@ -19,8 +22,9 @@ if st.session_state.show_all_reports:
     st.subheader("All Reports")
     # Here you would typically fetch and display the reports from your database
     # For demonstration, we'll just show a placeholder message
-    st.write("Displaying all reports... (This is where your report data would appear)")
-    st.dataframe({
-        "Title": ["Report 1", "Report 2", "Report 3"],
-        "Date": ["2023-01-01", "2023-01-02", "2023-01-03"],
-    })
+    st.write("Displaying all reports")
+    # Show all reports from database in dataframe, show only report id and date
+    conn = sqlite3.connect("report_log.db")
+    df = pd.read_sql_query("SELECT * FROM Reports", conn)
+    edit_df = st.data_editor(df, num_rows="dynamic", key="report_df")
+    conn.close()

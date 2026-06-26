@@ -46,8 +46,6 @@ if btn_submit_audio:
         transcription = transcribe_audio(saved_audio)
         dict_result = classify_text(transcription)
         # transform the string dictionary to an actual Python dictionary
-        st.write("Extracted Information:")
-        st.write(dict_result)
         st.success("Audio submitted successfully!")
         show_report_form(dict_result)
         #fill_report_form(dict_result)
