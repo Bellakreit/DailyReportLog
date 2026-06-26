@@ -39,12 +39,12 @@ if uploaded_file is not None:
 btn_submit_audio = st.button("Submit Audio")
 if btn_submit_audio:
     # Transcribe the audio
-    st.spinner("Transcribing audio...")
-    transcription = transcribe_audio(saved_audio)
-    st.write("Transcription:")
-    st.write(transcription)
-    st.success("Audio submitted successfully!")
-    show_report_form()
+    with st.spinner("Transcribing audio..."):
+        transcription = transcribe_audio(saved_audio)
+        st.write("Transcription:")
+        st.write(transcription)
+        st.success("Audio submitted successfully!")
+        show_report_form()
 
 btnshow = st.button("Enter Report Manually")
 if btnshow:
