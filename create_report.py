@@ -19,8 +19,16 @@ st.logo("Designer.png", size='large')
 # select project from dropdown from querying the database, no default value
 conn = sqlite3.connect("report_log.db")
 projects_df = pd.read_sql_query("SELECT * FROM Projects", conn)
+
+# map Name -> ProjectID
+project_map = dict(zip(projects_df["Name"], projects_df["ProjectID"]))
 project_names = projects_df["Name"].tolist()
-selected_project = st.selectbox("Select Project", project_names, key="selected_project", placeholder=None)
+
+selected_project_name = st.selectbox(
+    "Select Project", project_names, key="selected_project", placeholder=None
+)
+selected_project_id = project_map.get(selected_project_name)
+
 
 uploaded_file = st.file_uploader(
     "Upload an audio file",
@@ -47,7 +55,7 @@ if btn_submit_audio:
         dict_result = classify_text(transcription)
         # transform the string dictionary to an actual Python dictionary
         st.success("Audio submitted successfully!")
-        show_report_form(dict_result)
+        show_report_form(dict_result, selected_project_id)
         #fill_report_form(dict_result)
 
 btnshow = st.button("Enter Report Manually")

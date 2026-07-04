@@ -55,8 +55,8 @@ cursor.execute('''
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS ProjectWorkers (
         ProjectWorkerID INTEGER PRIMARY KEY AUTOINCREMENT,
-        ProjectID INTEGER,
-        WorkerID INTEGER,
+        ReportID INTEGER,
+        WorkerName TEXT,
         WorkerHours DOUBLE NOT NULL
     )
 ''')

@@ -2,6 +2,8 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 
+from report_form import show_report_form
+
 st.logo("Designer.png", size='large')
 
 def btnSeeAllReports_Click():
@@ -19,12 +21,16 @@ if "show_all_reports" not in st.session_state:
     st.session_state.show_all_reports = False  
 
 if st.session_state.show_all_reports:
-    st.subheader("All Reports")
-    # Here you would typically fetch and display the reports from your database
-    # For demonstration, we'll just show a placeholder message
-    st.write("Displaying all reports")
-    # Show all reports from database in dataframe, show only report id and date
+    # show report id and date in a table, and allow the user to click on a report to view it
+    st.write("Report ID | Date")
+    st.write("--- | ---")
     conn = sqlite3.connect("report_log.db")
-    df = pd.read_sql_query("SELECT * FROM Reports", conn)
-    edit_df = st.data_editor(df, num_rows="dynamic", key="report_df")
-    conn.close()
+    df = pd.read_sql_query("SELECT ReportID, Date FROM Reports", conn)
+    for index, row in df.iterrows():
+        report_id = row["ReportID"]
+        date = row["Date"]
+        if st.button(f"View Report {report_id} - {date}", key=f"view_report_{report_id}"):
+            st.session_state.selected_report_id = report_id
+            st.session_state.show_all_reports = False  # Close the all reports view
+            show_report_form(selected_project_id=None, report_id=st.session_state.selected_report_id)  # Call the function to show the report form with the selected report ID
+            st.success(f"Viewing Report ID: {report_id}")
