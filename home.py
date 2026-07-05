@@ -68,7 +68,8 @@ if st.session_state.show_form:
         customerForm = st.form('Profile')
         customerForm.subheader("New User Profile")  # form subheader
         UserName = customerForm.text_input('User Name')  # form txt boxes to be filled by the user
-        Password = customerForm.text_input('Password')
+        # make password stars
+        Password = customerForm.text_input('Password', type='password')
         FirstName = customerForm.text_input('First Name')
         LastName = customerForm.text_input('Last Name')
         Email = customerForm.text_input('Email')
@@ -87,7 +88,7 @@ if st.session_state.show_form:
         loginForm = st.form('Login')
         loginForm.subheader("Existing User")  # form subheader
         UserName = loginForm.text_input('User Name')  # inputs the username and password and then will be looked up
-        Password = loginForm.text_input('Password')
+        Password = loginForm.text_input('Password', type='password')
         if loginForm.form_submit_button("Login"):
             try:
                 conn2 = sqlite3.connect('report_log.db')  # open connection
