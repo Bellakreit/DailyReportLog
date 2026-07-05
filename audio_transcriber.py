@@ -2,9 +2,8 @@ from transformers import pipeline
 import torch
 
 
-# Use the smallest Whisper model for the fastest transcription.
+
 # "whisper-small" is more accurate than "whisper-tiny", but "whisper-tiny" is much faster.
-# If you want a balance between speed and quality, use "openai/whisper-small" or "openai/whisper-medium".
 MODEL_NAME = "openai/whisper-tiny"
 
 USE_GPU = torch.cuda.is_available()

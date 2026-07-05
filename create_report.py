@@ -38,6 +38,17 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     saved_audio = uploaded_file.getvalue()
 
+sample_btn = st.button("Use Sample Audio")
+# add a sample audio to be used
+sample_audio_path = Path("sample_audio.mp3")
+if sample_btn:
+    if sample_audio_path.exists():
+        with open(sample_audio_path, "rb") as f:
+            saved_audio = f.read()
+    else:
+        st.error("Sample audio file not found.")
+
+
 # st.title("Audio Recorder")
 # audio = audiorecorder("Click to record", "Click to stop recording")
 
@@ -48,7 +59,7 @@ if uploaded_file is not None:
     
 
 btn_submit_audio = st.button("Submit Audio")
-if btn_submit_audio:
+if btn_submit_audio or sample_btn:
     # Transcribe the audio
     with st.spinner("Creating report...this will take a few minutes"):
         transcription = transcribe_audio(saved_audio)
@@ -60,4 +71,4 @@ if btn_submit_audio:
 
 btnshow = st.button("Enter Report Manually")
 if btnshow:
-    show_report_form()
+    show_report_form(None, selected_project_id)
