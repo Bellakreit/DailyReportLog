@@ -81,6 +81,8 @@ if st.session_state.show_form:
                 conn2.close()  # close connection
                 st.session_state.show_form = False  # closes form after saved
                 st.success("Profile saved!")
+                # open page create report page
+                st.switch_page("create_report.py")
             except ValueError as e:  # if addcustomer found an error because the fields werent all filled
                  st.error(str(e))
 
@@ -98,6 +100,8 @@ if st.session_state.show_form:
                 st.success(f"Welcome back {customer[0]} {customer[1]}!")
                     # customer[0] = FirstName
                     # customer[1] = LastName
+                # open page create report page
+                st.switch_page("create_report.py")
             except ValueError as e:  # if customer was not found print error message
                 st.error(str(e))
         

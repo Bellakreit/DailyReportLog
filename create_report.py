@@ -2,13 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sqlite3
-#from audiorecorder import audiorecorder
 from report_form import show_report_form
-# from report_form import fill_report_form
 from audio_transcriber import transcribe_audio
 from pathlib import Path
-import torch
-
+import streamlit as st
+import tempfile
 from split_text import classify_text
 
 st.title("Create Report", text_alignment="center")
@@ -30,14 +28,7 @@ selected_project_name = st.selectbox(
 selected_project_id = project_map.get(selected_project_name)
 
 
-uploaded_file = st.file_uploader(
-    "Upload an audio file",
-    type=["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav"],
-    help="Audio files are supported in mpeg, mp4, wav, and x-wav formats.",
-)
-if uploaded_file is not None:
-    saved_audio = uploaded_file.getvalue()
-
+# sample audio implementation
 sample_btn = st.button("Use Sample Audio")
 # add a sample audio to be used
 sample_audio_path = Path("sample_audio.mp3")
@@ -48,15 +39,23 @@ if sample_btn:
     else:
         st.error("Sample audio file not found.")
 
+# upload audio implementation
+uploaded_file = st.file_uploader(
+    "Upload an audio file",
+    type=["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav"],
+    help="Audio files are supported in mpeg, mp4, wav, and x-wav formats.",
+)
+if uploaded_file is not None:
+    saved_audio = uploaded_file.getvalue()
 
-# st.title("Audio Recorder")
-# audio = audiorecorder("Click to record", "Click to stop recording")
 
-# if len(audio) > 0:
-#     # save audio as torch tensor DOES NOT WORK
-#     saved_audio = torch.from_numpy(np.array(audio))
-#     st.audio(saved_audio)
-    
+# record audio implementation
+audio = st.audio_input("Record your report")
+
+if audio:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
+        f.write(audio.read())
+        saved_audio = f.name
 
 btn_submit_audio = st.button("Submit Audio")
 if btn_submit_audio or sample_btn:

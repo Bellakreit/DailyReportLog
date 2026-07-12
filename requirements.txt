@@ -2,3 +2,4 @@ streamlit
 audiorecorder
 transformers
 torch
+pydantic
