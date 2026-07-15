@@ -72,6 +72,7 @@ def show_report_form(dict_result=None, selected_project_id=None):
 
         submit_report(
             conn=conn,
+            user_id=st.session_state.UserID,
             selected_project_id=st.session_state.get("selected_project_id"),
             date=st.session_state.date,
             description=st.session_state.description,
@@ -102,6 +103,7 @@ def show_report_form(dict_result=None, selected_project_id=None):
 
 def submit_report(
     conn,
+    user_id,
     selected_project_id,
     date,
     description,
@@ -118,6 +120,7 @@ def submit_report(
 
     cursor.execute('''
         INSERT INTO Reports (
+            UserID,
             ProjectID,
             Date,
             Description,
@@ -129,8 +132,9 @@ def submit_report(
             DustMaskUsed,
             OtherPPEUsed
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
+        user_id,
         selected_project_id,
         date,
         description,

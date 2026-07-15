@@ -15,10 +15,15 @@ def get_report_dict(report_id):
     conn = sqlite3.connect("report_log.db")
     cursor = conn.cursor()
 
+    # get the report only if it belongs to the logged-in user
     report_df = pd.read_sql_query(
-        "SELECT * FROM Reports WHERE ReportID = ?",
+        """
+        SELECT *
+        FROM Reports
+        WHERE ReportID = ? AND UserID = ?
+        """,
         conn,
-        params=(report_id,)
+        params=(report_id, st.session_state.UserID)
     )
 
     if report_df.empty:
@@ -48,16 +53,8 @@ def get_report_dict(report_id):
     return report
 
 
-see_all = st.button("See All Reports", type="primary", on_click=btnSeeAllReports_Click)
+see_all = st.button("See All Reports created by you", type="primary", on_click=btnSeeAllReports_Click)
 
-search_query = st.text_input(
-    "Search by title or date (YYYY-MM-DD)",
-    help="Enter a title or date to search for specific reports."
-)
-
-btn_search = st.button("Search", type="primary")
-if btn_search:
-    st.success(f"Searching for reports matching: {search_query}")
 
 
 if "show_all_reports" not in st.session_state:
@@ -67,7 +64,18 @@ if st.session_state.show_all_reports:
     st.write("Report ID | Date")
 
     conn = sqlite3.connect("report_log.db")
-    df = pd.read_sql_query("SELECT ReportID, Date FROM Reports", conn)
+
+    # show only reports that belong to the logged-in user
+    df = pd.read_sql_query(
+        """
+        SELECT ReportID, Date
+        FROM Reports
+        WHERE UserID = ?
+        """,
+        conn,
+        params=(st.session_state.UserID,)
+    )
+
     conn.close()
 
     for index, row in df.iterrows():

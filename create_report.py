@@ -60,13 +60,14 @@ if audio:
 btn_submit_audio = st.button("Submit Audio")
 if btn_submit_audio or sample_btn:
     # Transcribe the audio
-    with st.spinner("Creating report...this will take a few minutes"):
+
+    with st.spinner(text="Creating report...this will take a few minutes"):
         transcription = transcribe_audio(saved_audio)
         dict_result = classify_text(transcription)
         # transform the string dictionary to an actual Python dictionary
         st.success("Audio submitted successfully!")
         show_report_form(dict_result, selected_project_id)
-        #fill_report_form(dict_result)
+
 
 btnshow = st.button("Enter Report Manually")
 if btnshow:
