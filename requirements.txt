@@ -2,4 +2,4 @@ streamlit
 transformers
 torch
 pydantic
-ffpmeg
+ffmpeg-python

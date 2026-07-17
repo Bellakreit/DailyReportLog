@@ -28,7 +28,6 @@ def LogoutUser():  # log the user out and clear their information
     st.session_state.LastName = None
     st.session_state.show_form = False
     st.session_state.customer_type = None
-    st.rerun()
 
 
 def logout_page():  # logout page

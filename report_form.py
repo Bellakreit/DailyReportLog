@@ -10,9 +10,20 @@ def show_report_form(dict_result=None, selected_project_id=None):
     if selected_project_id is not None:
         st.session_state.selected_project_id = selected_project_id
 
-    # Pre-fill BEFORE widgets render
-    if dict_result and not st.session_state.get("_prefilled"):
+    if dict_result is None:
+        st.session_state._prefilled = False
+        st.session_state._worker_df = pd.DataFrame(columns=["Worker Name", "Hours Worked"])
+        st.session_state.date = pd.Timestamp.today().date()
+        st.session_state.description = ""
+        st.session_state.hard_hat_used = False
+        st.session_state.gloves_used = False
+        st.session_state.eye_protection_used = False
+        st.session_state.ear_protection_used = False
+        st.session_state.footware_used = False
+        st.session_state.dust_mask_used = False
+        st.session_state.other_ppe_used = ""
 
+    elif not st.session_state.get("_prefilled"):
         date_value = dict_result.get("Date", pd.Timestamp.today().date())
 
         if isinstance(date_value, str):
@@ -29,18 +40,14 @@ def show_report_form(dict_result=None, selected_project_id=None):
         st.session_state.other_ppe_used = str(dict_result.get("OtherPPEUsed", "") or "")
 
         workers = dict_result.get("WorkerHours", {})
-
         st.session_state._worker_df = pd.DataFrame(
             [(k, v) for k, v in workers.items()],
-            columns=["Worker Name", "Hours Worked"]
+            columns=["Worker Name", "Hours Worked"],
         ) if workers else pd.DataFrame(columns=["Worker Name", "Hours Worked"])
-
         st.session_state._prefilled = True
 
     if "_worker_df" not in st.session_state:
-        st.session_state._worker_df = pd.DataFrame(
-            columns=["Worker Name", "Hours Worked"]
-        )
+        st.session_state._worker_df = pd.DataFrame(columns=["Worker Name", "Hours Worked"])
 
     tab1, tab2, tab3 = st.tabs(["General", "Safety", "Worker Details"])
 
@@ -98,7 +105,6 @@ def show_report_form(dict_result=None, selected_project_id=None):
             del st.session_state["_worker_df"]
 
         st.success("Report submitted successfully!")
-        st.rerun()
 
 
 def submit_report(

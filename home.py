@@ -134,9 +134,6 @@ if st.session_state.show_form:
 
                 st.success("Profile saved!")
 
-                # refresh app so the navigation updates
-                st.rerun()
-
             except ValueError as e:  # if addcustomer found an error because the fields werent all filled
                 st.error(str(e))
 
@@ -164,9 +161,6 @@ if st.session_state.show_form:
                 # customer[0] = UserID
                 # customer[1] = FirstName
                 # customer[2] = LastName
-
-                # refresh app so the navigation updates
-                st.rerun()
 
             except ValueError as e:  # if customer was not found print error message
                 st.error(str(e))
