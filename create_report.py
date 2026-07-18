@@ -7,6 +7,10 @@ from pathlib import Path
 import tempfile
 from split_text import classify_text
 
+# setting the session state so the user will be brought to all reports page after their report is created
+if st.session_state.get("report_saved"):
+    st.switch_page("all_reports.py")
+
 st.title("Create Report", text_alignment="center")
 st.header("Create a new report")
 st.subheader("upload or record an audio to create your report")
@@ -73,12 +77,16 @@ if btn_submit_audio or sample_btn:
     if saved_audio is not None:
         with st.spinner(text="Creating report...this will take a few minutes"):
             transcription = transcribe_audio(saved_audio)
+            st.checkbox("audio transcribed", value=True, disabled=True)
             if not transcription or not transcription.strip():
                 st.error("The audio did not produce usable text. Please try a clearer recording or enter the report manually.")
             else:
                 st.session_state._prefilled = False
                 st.session_state._worker_df = pd.DataFrame(columns=["Worker Name", "Hours Worked"])
+                st.markdown("classifying text...")
                 dict_result = classify_text(transcription)
+                st.checkbox("text classified", value=True, disabled=True)
+                st.markdown("filling report form...")
                 if isinstance(dict_result, dict) and dict_result.get("error"):
                     st.warning("The AI output was not usable, so the form was left empty for you to complete manually.")
                     show_report_form(None, selected_project_id)

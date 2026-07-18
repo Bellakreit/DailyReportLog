@@ -1,8 +1,13 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
-
 from report_form import show_report_form
+
+# setting the session state so the the user will be brought back to main all reports page after saving their changes
+if st.session_state.get("report_saved"):
+    st.session_state.report_saved = False
+    st.session_state.show_all_reports = True
+    st.success("Report saved successfully!")
 
 st.logo("Designer.png", size='large')
 
@@ -129,7 +134,7 @@ if st.session_state.show_all_reports:
         date = row["Date"]
         report_data = get_report_dict(report_id)
 
-        col1, col2 = st.columns([4, 1.4])
+        col1, col2, col3 = st.columns([4, 1.4, 1])
 
         with col1:
             if st.button(f"View Report {report_id} - {date}", key=f"view_report_{report_id}"):
@@ -151,3 +156,24 @@ if st.session_state.show_all_reports:
                     mime="text/plain",
                     key=f"download_report_{report_id}",
                 )
+
+        with col3:
+            if st.button(f"Delete Report {report_id}", key=f"delete_report_{report_id}"):
+                conn = sqlite3.connect("report_log.db")
+                cursor = conn.cursor()
+
+                # delete the report only if it belongs to the logged-in user
+                cursor.execute(
+                    """
+                    DELETE FROM Reports
+                    WHERE ReportID = ? AND UserID = ?
+                    """,
+                    (report_id, st.session_state.UserID)
+                )
+                conn.commit()
+                conn.close()
+
+                st.success(f"Report ID: {report_id} deleted successfully.")
+                st.session_state.show_all_reports = True  # Refresh the report list
+    
+
