@@ -11,6 +11,7 @@ from split_text import classify_text
 if st.session_state.get("report_saved"):
     st.switch_page("all_reports.py")
 
+# streamlit page designing
 st.title("Create Report", text_alignment="center")
 st.header("Create a new report")
 st.subheader("upload or record an audio to create your report")
@@ -38,6 +39,7 @@ selected_project_name = st.selectbox(
 )
 selected_project_id = project_map.get(selected_project_name)
 
+# adding a session state variable for audio to keep track of what audio will be used
 if "saved_audio" not in st.session_state:
     st.session_state.saved_audio = None
 
@@ -73,8 +75,10 @@ if audio:
 saved_audio = st.session_state.saved_audio
 
 btn_submit_audio = st.button("Submit Audio")
+# if the button was pressed do the following
 if btn_submit_audio or sample_btn:
     if saved_audio is not None:
+        # using a spinner but also added check boxes to see progress of the report being made
         with st.spinner(text="Creating report...this will take a few minutes"):
             transcription = transcribe_audio(saved_audio)
             st.checkbox("audio transcribed", value=True, disabled=True)
@@ -87,12 +91,15 @@ if btn_submit_audio or sample_btn:
                 dict_result = classify_text(transcription)
                 st.checkbox("text classified", value=True, disabled=True)
                 st.markdown("filling report form...")
+                # error handling if the model output was not a dict or if it was a dict with an error key
                 if isinstance(dict_result, dict) and dict_result.get("error"):
                     st.warning("The AI output was not usable, so the form was left empty for you to complete manually.")
                     show_report_form(None, selected_project_id)
                 else:
                     st.success("Audio submitted successfully!")
                     show_report_form(dict_result, selected_project_id)
+
+    # if no audio was uploaded or recorded, show an error message
     else:
         st.error("Please upload or record audio before submitting.")
 

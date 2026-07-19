@@ -4,6 +4,8 @@ import sqlite3
 import pandas as pd
 
 @st.dialog("Report Form")
+
+# method to show report and deals with whether it is a new report or an existing report being edited
 def show_report_form(dict_result=None, selected_project_id=None):
 
     if selected_project_id is not None:
@@ -23,6 +25,7 @@ def show_report_form(dict_result=None, selected_project_id=None):
         st.session_state.dust_mask_used = False
         st.session_state.other_ppe_used = ""
 
+# if the report is being edited, prefill the form with the existing data
     elif not st.session_state.get("_prefilled"):
         st.session_state.edit_report_id = dict_result.get("ReportID")
 
@@ -30,7 +33,7 @@ def show_report_form(dict_result=None, selected_project_id=None):
 
         if isinstance(date_value, str):
             date_value = pd.to_datetime(date_value).date()
-
+        # getting the date from the dict and setting it to the session state so it can be used in the form
         st.session_state.date = date_value
         st.session_state.description = dict_result.get("Description", "")
         st.session_state.hard_hat_used = bool(dict_result.get("HardHatUsed", False))
@@ -53,6 +56,8 @@ def show_report_form(dict_result=None, selected_project_id=None):
 
     tab1, tab2, tab3 = st.tabs(["General", "Safety", "Worker Details"])
 
+
+    # setting the tabs of the form
     with tab1:
         st.date_input("Date (YYYY-MM-DD):", key="date")
         st.text_area("Description of the day's work:", key="description", height=100)
@@ -76,11 +81,13 @@ def show_report_form(dict_result=None, selected_project_id=None):
             key="worker_hours_editor"
         )
 
+    # if the report is being edited, set the edit_report_id to the session state so it can be used in the submit_report function   
     edit_report_id = st.session_state.get("edit_report_id")
 
     if st.button("Save Changes" if edit_report_id else "Submit"):
         conn = sqlite3.connect("report_log.db")
 
+        # if its edit then it just updates the report if its new then it submits and creates report
         if edit_report_id:
             update_report(
                 conn=conn,
@@ -129,6 +136,7 @@ def show_report_form(dict_result=None, selected_project_id=None):
         st.rerun()
 
 
+# function for submitting a new report to the database
 def submit_report(
     conn,
     user_id,
@@ -204,6 +212,7 @@ def submit_report(
     conn.commit()
 
 
+# function for updating an existing report in the database
 def update_report(
     conn,
     report_id,

@@ -22,6 +22,7 @@ class DailyReportData(BaseModel):
     @field_validator("WorkerHours", mode="before")
     @classmethod
     def clean_worker_hours(cls, value):
+        # Make sure worker hours are stored as a clean dictionary of names and valid numbers.
         if not isinstance(value, dict):
             return {}
         cleaned = {}
@@ -35,6 +36,7 @@ class DailyReportData(BaseModel):
         return cleaned
 
 
+# This prompt tells the model exactly how to structure the report output.
 PROMPT = """You extract structured data from a construction daily report transcript.
 
 Return ONLY a JSON object with exactly these keys:
@@ -66,7 +68,7 @@ Transcript: {text}
 Output:"""
 
 
-# main method: transcript in, clean python dictionary out
+# main method- transcript in, clean python dictionary out
 def classify_text(text):
     try:
         # load the model fresh every call - no stored state anywhere
