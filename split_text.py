@@ -42,7 +42,10 @@ PROMPT = """You extract structured data from a construction daily report transcr
 Return ONLY a JSON object with exactly these keys:
 "Description", "HardHatUsed", "GlovesUsed", "EyeProtectionUsed", "EarProtectionUsed", "FootwearUsed", "DustMaskUsed", "OtherPPEUsed", "WorkerHours"
 
-Description: a detailed summary of the work completed, in 2-4 full sentences. Keep every work detail from the transcript: the tasks done, where they happened (floor, room, or area), and the exact quantities, sizes, and materials mentioned (like "20 toilets" or "copper piping"). Never mention safety equipment, worker names, or hours here. No greetings, weather, or small talk. If the transcript has no construction or plumbing work at all, set it to exactly: "Non-plumbing related information was provided, so the report is incomplete."
+Description: a detailed summary of the work completed, in 2-4 full sentences. 
+Keep every work detail from the transcript: the tasks done, where they happened (floor, room, or area), and the exact quantities, sizes, and materials mentioned (like "20 toilets" or "copper piping"). 
+Never mention safety equipment, worker names, or hours here. No greetings, weather, or small talk. 
+If the transcript has no construction or plumbing work at all, set it to exactly: "Non-plumbing related information was provided, so the report is incomplete."
 
 Safety equipment checklist. Set the field to true if the transcript mentions ANY of its words, even worded slightly differently:
 - HardHatUsed: hard hat, hardhat, helmet, safety hat, head protection
